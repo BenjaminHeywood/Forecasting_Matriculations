@@ -1,0 +1,7 @@
+{% extends "dataVis/base.html" %}
+{% block content %}
+    {% for result in results %}
+        <h1>Predicted {{result.category}} matrics from: {{result.region}}</h1>
+        <p>{{result.predicted_matrics}}</p>
+    {% endfor %}
+{% endblock content %}
