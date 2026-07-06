@@ -1,6 +1,82 @@
 {% extends "dataVis/base.html" %}
 {% block content %}
 
- 
+<h1>Forecasting Matriculations</h1>
+
+<p>
+    Placeholder introduction text. This section will explain what the latest
+    snapshot represents and how the forecast summaries should be interpreted.
+</p>
+
+{% if latest_snapshot %}
+    <p><strong>Latest snapshot:</strong> {{ latest_snapshot }}</p>
+
+    <h2>Expected Matriculations by Faculty</h2>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Faculty</th>
+                <th>UG</th>
+                <th>RPG</th>
+                <th>TPG</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in faculty_summary.rows %}
+                <tr>
+                    <td>{{ row.label }}</td>
+                    <td>{{ row.UG|floatformat:1 }}</td>
+                    <td>{{ row.RPG|floatformat:1 }}</td>
+                    <td>{{ row.TPG|floatformat:1 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>{{ faculty_summary.totals.label }}</th>
+                <th>{{ faculty_summary.totals.UG|floatformat:1 }}</th>
+                <th>{{ faculty_summary.totals.RPG|floatformat:1 }}</th>
+                <th>{{ faculty_summary.totals.TPG|floatformat:1 }}</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <h2>Expected Matriculations by Region</h2>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Region</th>
+                <th>UG</th>
+                <th>RPG</th>
+                <th>TPG</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in region_summary.rows %}
+                <tr>
+                    <td>{{ row.label }}</td>
+                    <td>{{ row.UG|floatformat:1 }}</td>
+                    <td>{{ row.RPG|floatformat:1 }}</td>
+                    <td>{{ row.TPG|floatformat:1 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>{{ region_summary.totals.label }}</th>
+                <th>{{ region_summary.totals.UG|floatformat:1 }}</th>
+                <th>{{ region_summary.totals.RPG|floatformat:1 }}</th>
+                <th>{{ region_summary.totals.TPG|floatformat:1 }}</th>
+            </tr>
+        </tfoot>
+    </table>
+{% else %}
+    <p>No forecast data has been uploaded yet.</p>
+{% endif %}
+
+<p>
+    Placeholder closing text. This section can be replaced with commentary,
+    caveats, or next steps once the final dashboard wording is ready.
+</p>
 
 {% endblock content %}

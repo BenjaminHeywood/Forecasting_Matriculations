@@ -47,17 +47,21 @@
           {% block content %}{% endblock %}
         </div>
         <div class="col-md-4">
-        <div class="content-section">
-            <h3>Sidebar</h3>
-            <p class='text-muted'>This is a sidebar
-              <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Forecast</li>
-                <li class="list-group-item list-group-item-light">Upload</li>
-                <li class="list-group-item list-group-item-light">History</li>
-                <li class="list-group-item list-group-item-light">etc.</li>
-            </ul>
-            </p>
-        </div>
+        {% if show_data_filters %}
+            {% include "dataVis/data_filters.html" %}
+        {% else %}
+            <div class="content-section">
+                <h3>Sidebar</h3>
+                <p class='text-muted'>This is a sidebar
+                  <ul class="list-group">
+                    <li class="list-group-item list-group-item-light">Forecast</li>
+                    <li class="list-group-item list-group-item-light">Upload</li>
+                    <li class="list-group-item list-group-item-light">History</li>
+                    <li class="list-group-item list-group-item-light">etc.</li>
+                </ul>
+                </p>
+            </div>
+        {% endif %}
         </div>
     </div>
     </main>

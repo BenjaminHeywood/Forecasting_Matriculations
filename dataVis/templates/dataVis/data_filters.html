@@ -1,0 +1,64 @@
+<div class="content-section">
+    <h3>Filters</h3>
+
+    <form method="get">
+        <fieldset class="form-group">
+            <legend class="col-form-label pt-0">Controlled status</legend>
+            <div class="form-check">
+                <input
+                    class="form-check-input"
+                    type="radio"
+                    name="controlled"
+                    id="controlled-all"
+                    value="{{ all_filter_value }}"
+                    {% if selected_controlled == all_filter_value %}checked{% endif %}
+                >
+                <label class="form-check-label" for="controlled-all">All</label>
+            </div>
+            {% for option in controlled_options %}
+                <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="radio"
+                        name="controlled"
+                        id="controlled-{{ forloop.counter }}"
+                        value="{{ option }}"
+                        {% if selected_controlled == option %}checked{% endif %}
+                    >
+                    <label class="form-check-label" for="controlled-{{ forloop.counter }}">{{ option }}</label>
+                </div>
+            {% endfor %}
+        </fieldset>
+
+        <fieldset class="form-group">
+            <legend class="col-form-label pt-0">Fee status</legend>
+            <div class="form-check">
+                <input
+                    class="form-check-input"
+                    type="radio"
+                    name="fee_status"
+                    id="fee-status-all"
+                    value="{{ all_filter_value }}"
+                    {% if selected_fee_status == all_filter_value %}checked{% endif %}
+                >
+                <label class="form-check-label" for="fee-status-all">All</label>
+            </div>
+            {% for option in fee_status_options %}
+                <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="radio"
+                        name="fee_status"
+                        id="fee-status-{{ forloop.counter }}"
+                        value="{{ option.value }}"
+                        {% if selected_fee_status == option.value %}checked{% endif %}
+                    >
+                    <label class="form-check-label" for="fee-status-{{ forloop.counter }}">{{ option.label }}</label>
+                </div>
+            {% endfor %}
+        </fieldset>
+
+        <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+        <a href="{{ request.path }}" class="btn btn-secondary btn-sm">Clear</a>
+    </form>
+</div>
