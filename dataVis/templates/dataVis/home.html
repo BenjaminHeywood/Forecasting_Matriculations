@@ -1,24 +1,6 @@
 {% extends "dataVis/base.html" %}
 {% block content %}
 
-    <h2 class="mt-4">Expected Matriculations by ARMI Category</h2>
-    <table class="table table-striped table-sm">
-        <thead class="thead-dark">
-            <tr>
-                <th>ARMI Category</th>
-                <th>Expected Matriculations</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in summary_armi %}
-                <tr>
-                    <td>{{ row.ARMI_CATEGORY }}</td>
-                    <td>{{ row.expected_matriculations }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{% url 'dataVis-forecast' %}" class="btn btn-primary mt-3">View Full Forecast</a>
+ 
 
 {% endblock content %}

@@ -1,0 +1,23 @@
+{% extends "dataVis/base.html" %}
+{% block content %}
+
+<h1>Upload Page</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">
+        Upload
+    </button>
+</form>
+
+{% if saved_count is not None %}
+    <p>{{ saved_count }} forecast rows saved.</p>
+{% endif %}
+
+{% if table %} 
+    {{ table|safe }}
+{% endif %}
+
+{% endblock content %}

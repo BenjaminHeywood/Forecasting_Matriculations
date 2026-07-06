@@ -1,55 +1,64 @@
-
-from django.shortcuts import render
 import pandas as pd
-import json
+from django.db import transaction
+from django.shortcuts import render
 
-summary_course = pd.read_csv(r"C:\Users\bheywood\OneDrive - University of Dundee\Desktop\Dissertation\summary_course.csv")
-summary_region = pd.read_csv(r"C:\Users\bheywood\OneDrive - University of Dundee\Desktop\Dissertation\summary_region.csv")
+from .forms import UploadCSVForm
+from .model.predictor import score_dataframe
+from .models import Forecast
 
-
-# results = [
-#     {
-#         'category': 'UG',
-#         'region': 'Africa', 
-#         'controlled': 'Yes', 
-#         'fee_status': 'Overseas',
-#         'date': '2026-06-07', 
-#         'predicted_matrics': '35'
-#     },
-#         {
-#         'category': 'UG',
-#         'region': 'North America', 
-#         'controlled': 'Yes', 
-#         'fee_status': 'Overseas',
-#         'date': '2026-06-07',
-#         'predicted_matrics': '15'
-#     }
-# ]
-
-
-# Simple summary for home page
-summary_armi = (
-    summary_course.groupby("ARMI_CATEGORY")["expected_matriculations"]
-    .sum()
-    .round(1)
-    .reset_index()
-    .sort_values("expected_matriculations", ascending=False)
-)
 
 def home(request):
-    context = {
-        'summary_armi': summary_armi.to_dict(orient="records"),
-    }
-    return render(request, 'dataVis/home.html', context)
+    return render(request, "dataVis/home.html")
+
 
 def forecast(request):
-    context = {
-        'summary_course': summary_course.to_dict(orient="records"),
-        'summary_region': summary_region.to_dict(orient="records"),
-        'summary_course_json': json.dumps(summary_course.to_dict(orient="records")),
-        'summary_region_json': json.dumps(summary_region.to_dict(orient="records")),
-    }
-    return render(request, 'dataVis/forecast.html', context)
+    return render(request, "dataVis/forecast.html")
+
 
 def about(request):
-    return render(request, 'dataVis/about.html')
+    return render(request, "dataVis/about.html")
+
+
+def upload(request):
+    form = UploadCSVForm()
+    table = None
+    saved_count = None
+
+    if request.method == "POST":
+        form = UploadCSVForm(request.POST, request.FILES)
+
+        if form.is_valid() and form.cleaned_data["file"]:
+            uploaded_file = form.cleaned_data["file"]
+            df = pd.read_csv(uploaded_file)
+            summary, snapshot_date = score_dataframe(df)
+
+            forecasts = [
+                Forecast(
+                    faculty_name=row["FACULTY_NAME"],
+                    armi_category=row["ARMI_CATEGORY"],
+                    region=row["REGION_GROUP"],
+                    fee_status=row["FEE_STATUS_CAPS"],
+                    controlled=str(row["Controlled"]),
+                    total_applications=int(row["Applications"]),
+                    avg_matric_prob=float(row["Average_Probability"]),
+                    expected_matriculations=float(row["Expected_Matriculations"]),
+                    snapshot_date=snapshot_date,
+                )
+                for _, row in summary.iterrows()
+            ]
+
+            with transaction.atomic():
+                Forecast.objects.bulk_create(forecasts)
+
+            saved_count = len(forecasts)
+            table = summary.to_html(index=False, classes="table table-striped")
+
+    return render(
+        request,
+        "dataVis/upload.html",
+        {
+            "form": form,
+            "table": table,
+            "saved_count": saved_count,
+        },
+    )
