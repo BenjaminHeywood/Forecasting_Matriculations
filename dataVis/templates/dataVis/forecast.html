@@ -3,6 +3,15 @@
 {% block content %}
     <h1>Expected Matriculations by Snapshot Date</h1>
     <canvas id="applications-chart"></canvas>
+
+    <p>
+
+        This chart shows how expected matriculations have changed across each applicant snapshot during the current admissions cycle. Each line represents an ARMI Category, allowing trends to be compared as new applicant data becomes available.
+
+Forecasts are generated independently for each snapshot using only the information available at that point in the cycle. Changes between snapshots reflect updates to applicant records, including new applications, offers, acceptances and withdrawals, rather than changes to the forecasting model itself.
+
+Later snapshots typically provide more stable and accurate forecasts as additional applicant information becomes available. This view is intended to support monitoring of recruitment trends and identify how expected matriculations evolve throughout the admissions cycle.
+    </p>
 {% endblock content %}
 
 {% block extra_scripts %}

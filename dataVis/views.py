@@ -1,14 +1,18 @@
 import json
-
 import pandas as pd
+
 from django.db.models import Max, Sum
 from django.db.models.functions import Trim
 from django.db import transaction
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .decorators import group_required
 
 from .forms import UploadCSVForm
 from .model.predictor import score_dataframe
 from .models import Forecast
+
+
 
 ARMI_CATEGORIES = ["UG", "RPG", "TPG"]
 ALL_FILTER_VALUE = "all"
@@ -215,6 +219,8 @@ def about(request):
     return render(request, "dataVis/about.html")
 
 
+@login_required
+@group_required('Uploaders')
 def upload(request):
     form = UploadCSVForm()
     table = None
