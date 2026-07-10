@@ -9,8 +9,9 @@ from django.contrib.auth.decorators import login_required
 from .decorators import group_required
 
 from .forms import UploadCSVForm
-from .model.predictor import score_dataframe
+from .model.predictor import score_dataframe, MODEL_DB_ID
 from .models import Forecast, ForecastModel
+
 
 
 
@@ -237,8 +238,8 @@ def upload(request):
     df = pd.read_csv(uploaded_file)
 
     summary, snapshot_date = score_dataframe(df)
-
-    forecast_model = ForecastModel.objects.get(pk=1)
+    
+    forecast_model = ForecastModel.objects.get(pk=MODEL_DB_ID)
 
     forecasts = [
         Forecast(

@@ -6,7 +6,7 @@ from ..src.preprocessing import process_df
 
 MODEL_PATH = Path(__file__).resolve().parent / "gbdt_v1.1.joblib"
 model = joblib.load(MODEL_PATH)
-
+MODEL_DB_ID = 1
 
 def score_dataframe(df):
 
