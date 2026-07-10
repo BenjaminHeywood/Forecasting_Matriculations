@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ..src.preprocessing import process_df
 
-MODEL_PATH = Path(__file__).resolve().parent / "matriculation_model.joblib"
+MODEL_PATH = Path(__file__).resolve().parent / "gbdt_v1.1.joblib"
 model = joblib.load(MODEL_PATH)
 
 
