@@ -11,7 +11,7 @@ from .decorators import group_required
 from .forms import UploadCSVForm
 from .model.predictor import score_dataframe, MODEL_DB_ID
 from .models import Forecast, ForecastModel
-
+from .validation import READ_CSV_DTYPES, validate_upload_schema, SchemaValidationError
 
 
 
@@ -227,40 +227,47 @@ def upload(request):
     table = None
     saved_count = None
 
-    
-
     if request.method == "POST":
         form = UploadCSVForm(request.POST, request.FILES)
 
         if form.is_valid() and form.cleaned_data["file"]:
             uploaded_file = form.cleaned_data["file"]
-    
-    df = pd.read_csv(uploaded_file)
 
-    summary, snapshot_date = score_dataframe(df)
-    
-    forecast_model = ForecastModel.objects.get(pk=MODEL_DB_ID)
+            try:
+                df = pd.read_csv(uploaded_file, dtype=READ_CSV_DTYPES)
+            except Exception:
+                form.add_error("file", "Could not parse this file as a CSV.")
+            else:
+                try:
+                    df = validate_upload_schema(df)
+                except SchemaValidationError as exc:
+                    for err in exc.errors:
+                        form.add_error("file", err)
+                else:
+                    summary, snapshot_date = score_dataframe(df)
 
-    forecasts = [
-        Forecast(
-            model=forecast_model,
-            faculty_name=row["FACULTY_NAME"],
-            armi_category=row["ARMI_CATEGORY"],
-            region=row["REGION_GROUP"],
-            fee_status=row["FEE_STATUS_CAPS"],
-            controlled=str(row["Controlled"]),
-            total_applications=int(row["Applications"]),
-            avg_matric_prob=float(row["Average_Probability"]),
-            expected_matriculations=float(row["Expected_Matriculations"]),
-            snapshot_date=snapshot_date,
-        )
-        for _, row in summary.iterrows()
-    ]
+                    forecast_model = ForecastModel.objects.get(pk=MODEL_DB_ID)
 
-    with transaction.atomic():
-        Forecast.objects.bulk_create(forecasts)
-        saved_count = len(forecasts)
-        table = summary.to_html(index=False, classes="table table-striped")
+                    forecasts = [
+                        Forecast(
+                            forecast_model=forecast_model,
+                            faculty_name=row["FACULTY_NAME"],
+                            armi_category=row["ARMI_CATEGORY"],
+                            region=row["REGION_GROUP"],
+                            fee_status=row["FEE_STATUS_CAPS"],
+                            controlled=str(row["Controlled"]),
+                            total_applications=int(row["Applications"]),
+                            avg_matric_prob=float(row["Average_Probability"]),
+                            expected_matriculations=float(row["Expected_Matriculations"]),
+                            snapshot_date=snapshot_date,
+                        )
+                        for _, row in summary.iterrows()
+                    ]
+
+                    with transaction.atomic():
+                        Forecast.objects.bulk_create(forecasts)
+                        saved_count = len(forecasts)
+                        table = summary.to_html(index=False, classes="table table-striped")
 
     return render(
         request,

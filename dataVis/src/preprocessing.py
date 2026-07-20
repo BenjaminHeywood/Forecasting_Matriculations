@@ -48,27 +48,25 @@ def process_df(df):
     )
 
     df = df.drop(columns=[
-    "STUDENT_ID", "APF_SEQ_NUM", "CAP_SEQ_NUM",  # used only for APPLICATION_ID
-    "MATRICULATIONS",                               # used only for matriculated_ids
-    "Kind", "Name",                                 # never used
-    "COURSE_LEVEL", "COURSE_TYPE", "COURSE_TYPE_NAME",  # never used
-    "CAP_PREF",                                     # never used
-    "ACCEPTANCE_STATUS_NAME",                       # never used
-    "ETHNICITY_GRP",                                # never used
+    "STUDENT_ID", "APF_SEQ_NUM", "CAP_SEQ_NUM",  
+    "MATRICULATIONS",                               
+    "Kind", "Name",                                 
+    "COURSE_LEVEL", "COURSE_TYPE", "COURSE_TYPE_NAME", 
+    "CAP_PREF",                                     
+    "ACCEPTANCE_STATUS_NAME",                       
+    "ETHNICITY_GRP",                                
 ])
 
     df["MATRICULATED"] = (
         df["APPLICATION_ID"].isin(matriculated_ids)
     ).astype(int)    
 
-    # Parse Snapshot Date first, before any date calculations
     df["Snapshot Date"] = pd.to_datetime(df["Snapshot Date"], dayfirst=True)
 
     df["CREATED_DATE"] = pd.to_datetime(df["CREATED_DATE"], dayfirst=True, errors="coerce")
 
     df["days_since_created"] = (df["Snapshot Date"] - df["CREATED_DATE"]).dt.days
 
-    # Start date lookup
     start_dates_df = pd.DataFrame([
         {"SEMESTER": "Semester 1", "ENTRY_YEAR": "2025/6", "start_date": pd.Timestamp("2025-09-22")},
         {"SEMESTER": "Semester 2", "ENTRY_YEAR": "2025/6", "start_date": pd.Timestamp("2026-01-19")},
@@ -83,7 +81,6 @@ def process_df(df):
     df["days_before_start"] = (df["start_date"] - df["Snapshot Date"]).dt.days
     df["snapshot_week"] = df["days_before_start"] // 7
 
-    # Drop rows more than a month after start
     df = df[df["days_before_start"] >= -30]
     df = df.drop(columns=["start_date"])
 
@@ -150,7 +147,6 @@ def process_df(df):
         df["days_since_stage3"].fillna(-1)
     )
 
-    # Vectorised domicile grouping
     conditions = [
         df["DOMICILE"].isin(major_countries),
         df["REGION"].str.startswith("Scotland", na=False),
@@ -198,7 +194,7 @@ def process_df(df):
 
     region_choices = [
         "Scotland", "England",
-        df["REGION"],   # keeps Wales/Northern Ireland as-is
+        df["REGION"],   
         "Africa", "Asia", "Europe", "Americas", "Australasia",
     ]
 
